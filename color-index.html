@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+ <head>
+  <meta charset="utf-8">
+  <title>Asteroid color index</title>
+<style>
+.chart {
+
+}
+
+.main text {
+    font: 10px sans-serif;	
+}
+
+.axis line, .axis path {
+    shape-rendering: crispEdges;
+    stroke: black;
+    fill: none;
+}
+
+circle { _fill: #000; }
+
+</style>
+<script type="text/javascript" src="lib/d3.js"></script>
+      </head>
+      <body>
+        <div class='content'>
+          <!-- /the chart goes here -->
+        </div>
+<script type="text/javascript">
+  //var data = [];
+  range = { ap: [ 2.0863, 3.7561 ],
+              ep: [ 0.0005, 0.3 ],
+              ip: [ 0.0115, 17.4576 ],
+              astar: [ -1, 1 ],
+              iz: [ -1, 1 ] };
+
+
+  var margin = {top: 20, right: 15, bottom: 60, left: 60},
+      width = 600 - margin.left - margin.right,
+      height = 600 - margin.top - margin.bottom,
+      scale = 60, 
+      angle = [30, 0, 90];
+
+  d3.csv('data/ast-proper14.csv', function(error, data) {
+    if (error) return console.log(error);
+
+    var x = d3.scale.linear().domain([range.astar[0], range.astar[1]]).range([ 0, width ]);
+    
+    var y = d3.scale.linear().domain([range.iz[0], range.iz[1]]).range([ height, 0 ]);
+   
+    var chart = d3.select('body')
+                  .append('svg:svg')
+                  .attr('width', width + margin.right + margin.left)
+                  .attr('height', height + margin.top + margin.bottom)
+                  .attr('class', 'chart');
+
+    var main = chart.append('g')
+                    .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
+                    .attr('width', width)
+                    .attr('height', height)
+                    .attr('class', 'main'); 
+          
+    // draw the x axis
+    var xAxis = d3.svg.axis().scale(x).orient('bottom');
+
+    main.append('g')
+        .attr('transform', 'translate(0,' + height + ')')
+        .attr('class', 'main axis date')
+        .call(xAxis);
+
+    // draw the y axis
+    var yAxis = d3.svg.axis().scale(y).orient('left');
+
+    main.append('g')
+        .attr('transform', 'translate(0,0)')
+        .attr('class', 'main axis date')
+        .call(yAxis);
+
+    var g = main.append("svg:g"); 
+
+    g.selectAll("scatter-dots")
+     .data(data)
+     .enter().append("svg:circle")
+     .attr("cx", function(d,i) { return x(d.astar); } )
+     .attr("cy", function(d) { return y(d.iz); } )
+     .attr("r", 1)
+     .style("fill", astColor )
+  });
+
+  function astColor(d) {
+    var r = 255 * (parseFloat(d.astar) + 0.3) * 2;
+    if (r < 0) r = 0;
+    if (r > 255) r = 255;
+    //if (d.astar > 0) b *= (1 - d.astar);
+    if (r < 0) r = 0;
+    b = 255 - r;
+    //if (d.astar < 0) return "rgb(0,0," + Math.floor(255 - b) + ")";
+    var g = 255 * (parseFloat(d.iz) + 0.5) * 1.42;
+    if (g < 0) g = 0;
+    if (g > 255) g = 255;
+    //var g = 255 - r;
+    if (d.iz < 0) r *= (1 + parseFloat(d.iz));
+    return "rgb(" + Math.floor(r) + "," + Math.floor(255 - g) + "," + Math.floor(b) + ")";
+  }
+</script>
+
+</body>
+</html>
