@@ -1,0 +1,25 @@
+{
+  "name": "asteroid-families",
+  "version": "0.1.0",
+  "description": "3D plot of asteroid families by proper elements and colors",
+  "main": "make.js",
+  "devDependencies": {
+    "jshint": "^2.6.0",
+    "shelljs": "^0.3.0",
+    "tar-fs": "^1.4.2",
+    "uglify-js": "^2.4.16"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+   "repository": {
+    "type": "git",
+    "url": "https://github.com/ofrohn/asteroid-families.git"
+  },
+ "keywords": [
+    "D3.js",
+    "Asteroids"
+  ],
+  "author": "Olaf Frohn",
+  "license": "BSD-3-Clause"
+}
