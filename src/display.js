@@ -28,7 +28,7 @@ var Asteroids = {
       //a vs. i   if (angle[0] > 80 && angle[2] < 10)
         ai: [90, 0, 0],
       //e vs. i   if (angle[0] < 10 && angle[2] > 80)
-        ei: [0, 0, 90]
+        ei: [0, 0, -90]
       },
       angle = angles.ae;
       
@@ -42,8 +42,8 @@ var Asteroids = {
   //Scales for rotation with dragging
   //x = d3.scale.linear().domain([-width/2, width/2]).range([-180+angle[0], 180+angle[0]]);
   //z = d3.scale.linear().domain([-height/2, height/2]).range([90-angle[2], -90-angle[2]]);
-  x = d3.scale.linear().domain([-width/2, width/2]).range([-180, 180]);
-  z = d3.scale.linear().domain([-height/2, height/2]).range([90, -90]);
+  x = d3.scale.linear().domain([-width/2, width/2]).range([-90, 90]);
+  z = d3.scale.linear().domain([-height/2, height/2]).range([-90, 90]);
 
   var zoom = d3.behavior.zoom().center([0, 0]).scaleExtent([0.7, 3]).translate([x.invert(angle[0]), z.invert(angle[2])]).scale(zoomlvl).on("zoom", redraw);
   //
@@ -51,6 +51,8 @@ var Asteroids = {
 
   rmatrix = getRotation(angle);
   
+    //angle = [x(trans[1]), 0, z(trans[0])];
+    //trans = ([x.invert(angle[2]), z.invert(angle[1])])
   
 Asteroids.display = function(config) {
   
@@ -61,17 +63,17 @@ Asteroids.display = function(config) {
 
   d3.select("#ae").on("click", function() {
     angle = angles.ae;
-    zoom.translate([x.invert(angle[0]), z.invert(angle[2])])
+    zoom.translate([x.invert(angle[2]), z.invert(angle[0])])
     redraw();
   });
   d3.select("#ai").on("click", function() {
     angle = angles.ai;
-    zoom.translate([x.invert(angle[0]), z.invert(angle[2])])
+    zoom.translate([x.invert(angle[2]), z.invert(angle[0])])
     redraw();
   });
   d3.select("#ei").on("click", function() {
     angle = angles.ei;
-    zoom.translate([x.invert(angle[0]), z.invert(angle[2])])
+    zoom.translate([x.invert(angle[2]), z.invert(angle[0])])
     redraw();
   });
 
@@ -134,7 +136,7 @@ function redraw() {
   zoomlvl = zoom.scale();  
   if (d3.event && d3.event.sourceEvent && d3.event.sourceEvent.type !== "wheel") {
     var trans = zoom.translate();
-    angle = [x(trans[1]), 0, -z(trans[0])];
+    angle = [x(trans[1]), 0, z(trans[0])];
   }
   
   rmatrix = getRotation(angle);
