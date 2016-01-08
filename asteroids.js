@@ -157,8 +157,8 @@ var getFamily = function(d) {
   var key,
       x = scale.ap(d.ap),
       y = scale.ep(d.ep),
-      z = scale.ip(d.sinip); //Math.asin(d["sin ip"])*180/Math.PI),
-      col = "#fff" //astColor(d), 
+      z = scale.ip(d.sinip); 
+      col = "#fff"; //astColor(d), 
       n = d.Name;
       
   return {pos:[x, y, z], col:col, n:n};
@@ -195,21 +195,21 @@ var axis3d = function() {
     var ax = orientation(orient_);
     path3d(ax);
     ctx.fillStyle = color;
-    if (title != "") {
+    if (title !== "") {
       ctx.font = titleFont;
       var r = scale.range(), ctr = (r[0] + r[1]) / 2, c = tickmark(ctr, titlePadding),
           ttl = textmark(c, titlePadding);
       
       text3d(title, ttl);
     }
-    if (tickArguments_ == 0) return;
+    if (tickArguments_ === 0) return;
     ctx.font = font;
     var ticks = scale.ticks(tickArguments_); //tickmarks
     ticks.forEach( function(d, i) { 
       var x = scale(d);
       tick = tickmark(x);
       path3d(tick);
-      if (i % valueFraction == 0) {  //values
+      if (i % valueFraction === 0) {  //values
         var txt = textmark(tick, tickPadding);
         text3d(d, txt);
       }
@@ -379,9 +379,12 @@ var Asteroids = {
      x  Line, Position, Values l h, Title, Visibility
        Ticks major minor
        No Axis when foreshortened
+         a vs. e  if (abs angle[0] < 10 && abs angle[2] < 10)
+         a vs. i  if (abs angle[0] > 80 && abs angle[2] < 10)
+         e vs. i  if (abs angle[0] < 10 && abs angle[2] > 80)
      x Families
      x Vesta,Flora,Baptistina,Nyssa-Polana,Agnia,Eunomia,Mitidika,Teutonia,Ursula,Koronis,Eos,Hygiea,Themis
-     Gaps  2.5,2.82
+     Gaps?  2.5,2.82
    */
   var rmatrix, canvas, sbos = [], families = [], axes, 
       LINECOL = "#fff",
@@ -396,12 +399,9 @@ var Asteroids = {
       offset = halfwidth + margin,
       zoomlvl = 0.9, 
       angles = {
-      //a vs. e  if (angle[0] < 10 && angle[2] < 10)
-        ae: [0, 0, 0],
-      //a vs. i   if (angle[0] > 80 && angle[2] < 10)
-        ai: [90, 0, 0],
-      //e vs. i   if (angle[0] < 10 && angle[2] > 80)
-        ei: [0, 0, -90]
+        ae: [0, 0, 0],   //a vs. e  
+        ai: [90, 0, 0],  //a vs. i  
+        ei: [0, 0, -90]  //e vs. i 
       },
       angle = angles.ae;
       
@@ -410,7 +410,7 @@ var Asteroids = {
     ap: d3.scale.linear().domain([2.0, 3.7]).range([-halfwidth, halfwidth]),
     ep: d3.scale.linear().domain([0.0, 0.3]).range([-halfwidth, halfwidth]),
     ip: d3.scale.linear().domain([0.0, 0.3]).range([-halfwidth, halfwidth])
-  }
+  };
   
   //Scales for rotation with dragging
   //x = d3.scale.linear().domain([-width/2, width/2]).range([-180+angle[0], 180+angle[0]]);
@@ -436,18 +436,15 @@ Asteroids.display = function(config) {
 
   d3.select("#ae").on("click", function() {
     angle = angles.ae;
-    zoom.translate([x.invert(angle[2]), z.invert(angle[0])])
-    redraw();
+    turn();
   });
   d3.select("#ai").on("click", function() {
     angle = angles.ai;
-    zoom.translate([x.invert(angle[2]), z.invert(angle[0])])
-    redraw();
+    turn();
   });
   d3.select("#ei").on("click", function() {
     angle = angles.ei;
-    zoom.translate([x.invert(angle[2]), z.invert(angle[0])])
-    redraw();
+    turn();
   });
 
   canvas = d3.select("#map").append("canvas")
@@ -493,7 +490,7 @@ Asteroids.display = function(config) {
     redraw();
   });
 
-}
+};
 
 
 function translate(d) {
@@ -502,6 +499,11 @@ function translate(d) {
   p[0] *= zoomlvl; p[2] *= zoomlvl;  
   return [ p[0] + offset, -p[2] + offset ];
   //return "translate(" + p[0] + "," + -p[2] + ")";
+}
+
+function turn() {
+  zoom.translate([x.invert(angle[2]), z.invert(angle[0])]);
+  redraw();
 }
 
 
@@ -529,7 +531,7 @@ function redraw() {
     canvas.font = FONT;
     canvas.globalAlpha = 0.6;
     
-    for (var i=0; i < families.length; i++) {
+    for (i=0; i < families.length; i++) {
       var t = families[i];
       canvas.fillStyle = t.col;
       text3d(t.n, t.pos);
@@ -557,7 +559,7 @@ function path3d(d) {
       canvas.moveTo(pt[0], pt[1]);
     else
       canvas.lineTo(pt[0], pt[1]);
-  };
+  }
   canvas.stroke();
 }
 

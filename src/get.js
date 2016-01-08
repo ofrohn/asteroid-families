@@ -17,8 +17,8 @@ var getFamily = function(d) {
   var key,
       x = scale.ap(d.ap),
       y = scale.ep(d.ep),
-      z = scale.ip(d.sinip); //Math.asin(d["sin ip"])*180/Math.PI),
-      col = "#fff" //astColor(d), 
+      z = scale.ip(d.sinip); 
+      col = "#fff"; //astColor(d), 
       n = d.Name;
       
   return {pos:[x, y, z], col:col, n:n};

@@ -13,21 +13,21 @@ var axis3d = function() {
     var ax = orientation(orient_);
     path3d(ax);
     ctx.fillStyle = color;
-    if (title != "") {
+    if (title !== "") {
       ctx.font = titleFont;
       var r = scale.range(), ctr = (r[0] + r[1]) / 2, c = tickmark(ctr, titlePadding),
           ttl = textmark(c, titlePadding);
       
       text3d(title, ttl);
     }
-    if (tickArguments_ == 0) return;
+    if (tickArguments_ === 0) return;
     ctx.font = font;
     var ticks = scale.ticks(tickArguments_); //tickmarks
     ticks.forEach( function(d, i) { 
       var x = scale(d);
       tick = tickmark(x);
       path3d(tick);
-      if (i % valueFraction == 0) {  //values
+      if (i % valueFraction === 0) {  //values
         var txt = textmark(tick, tickPadding);
         text3d(d, txt);
       }

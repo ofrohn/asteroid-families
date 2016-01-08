@@ -6,9 +6,12 @@ var Asteroids = {
      x  Line, Position, Values l h, Title, Visibility
        Ticks major minor
        No Axis when foreshortened
+         a vs. e  if (abs angle[0] < 10 && abs angle[2] < 10)
+         a vs. i  if (abs angle[0] > 80 && abs angle[2] < 10)
+         e vs. i  if (abs angle[0] < 10 && abs angle[2] > 80)
      x Families
      x Vesta,Flora,Baptistina,Nyssa-Polana,Agnia,Eunomia,Mitidika,Teutonia,Ursula,Koronis,Eos,Hygiea,Themis
-     Gaps  2.5,2.82
+     Gaps?  2.5,2.82
    */
   var rmatrix, canvas, sbos = [], families = [], axes, 
       LINECOL = "#fff",
@@ -23,12 +26,9 @@ var Asteroids = {
       offset = halfwidth + margin,
       zoomlvl = 0.9, 
       angles = {
-      //a vs. e  if (angle[0] < 10 && angle[2] < 10)
-        ae: [0, 0, 0],
-      //a vs. i   if (angle[0] > 80 && angle[2] < 10)
-        ai: [90, 0, 0],
-      //e vs. i   if (angle[0] < 10 && angle[2] > 80)
-        ei: [0, 0, -90]
+        ae: [0, 0, 0],   //a vs. e  
+        ai: [90, 0, 0],  //a vs. i  
+        ei: [0, 0, -90]  //e vs. i 
       },
       angle = angles.ae;
       
@@ -37,17 +37,17 @@ var Asteroids = {
     ap: d3.scale.linear().domain([2.0, 3.7]).range([-halfwidth, halfwidth]),
     ep: d3.scale.linear().domain([0.0, 0.3]).range([-halfwidth, halfwidth]),
     ip: d3.scale.linear().domain([0.0, 0.3]).range([-halfwidth, halfwidth])
-  }
+  };
   
   //Scales for rotation with dragging
   //x = d3.scale.linear().domain([-width/2, width/2]).range([-180+angle[0], 180+angle[0]]);
   //z = d3.scale.linear().domain([-height/2, height/2]).range([90-angle[2], -90-angle[2]]);
-  x = d3.scale.linear().domain([-width/2, width/2]).range([-90, 90]);
-  z = d3.scale.linear().domain([-height/2, height/2]).range([-90, 90]);
+  rot = d3.scale.linear().domain([-width/2, width/2]).range([-90, 90]);
+  //z = d3.scale.linear().domain([-height/2, height/2]).range([-90, 90]);
 
-  var zoom = d3.behavior.zoom().center([0, 0]).scaleExtent([0.7, 3]).translate([x.invert(angle[0]), z.invert(angle[2])]).scale(zoomlvl).on("zoom", redraw);
+  var zoom = d3.behavior.zoom().center([0, 0]).scaleExtent([0.7, 3]).translate([rot.invert(angle[0]), rot.invert(angle[2])]).scale(zoomlvl).on("zoom", redraw);
   //
-  var line = d3.svg.line().x( function(d) { return d[0]; } ).y( function(d) { return d[1]; } );
+  //var line = d3.svg.line().x( function(d) { return d[0]; } ).y( function(d) { return d[1]; } );
 
   rmatrix = getRotation(angle);
   
@@ -63,25 +63,21 @@ Asteroids.display = function(config) {
 
   d3.select("#ae").on("click", function() {
     angle = angles.ae;
-    zoom.translate([x.invert(angle[2]), z.invert(angle[0])])
-    redraw();
+    turn();
   });
   d3.select("#ai").on("click", function() {
     angle = angles.ai;
-    zoom.translate([x.invert(angle[2]), z.invert(angle[0])])
-    redraw();
+    turn();
   });
   d3.select("#ei").on("click", function() {
     angle = angles.ei;
-    zoom.translate([x.invert(angle[2]), z.invert(angle[0])])
-    redraw();
+    turn();
   });
 
   canvas = d3.select("#map").append("canvas")
       .attr("width", width + margin * 2)
       .attr("height", height + margin * 2)
-      .call(zoom)
-      .node().getContext("2d");
+      .call(zoom).node().getContext("2d");
   
   axes = {
     x: axis3d().scale(scale.ap).ticks(17).tickPadding(6).title("a\u209a / AU"),
@@ -120,7 +116,7 @@ Asteroids.display = function(config) {
     redraw();
   });
 
-}
+};
 
 
 function translate(d) {
@@ -131,12 +127,17 @@ function translate(d) {
   //return "translate(" + p[0] + "," + -p[2] + ")";
 }
 
+function turn() {
+  zoom.translate([rot.invert(angle[2]), rot.invert(angle[0])]);
+  redraw();
+}
+
 
 function redraw() {
   zoomlvl = zoom.scale();  
   if (d3.event && d3.event.sourceEvent && d3.event.sourceEvent.type !== "wheel") {
     var trans = zoom.translate();
-    angle = [x(trans[1]), 0, z(trans[0])];
+    angle = [rot(trans[1]), 0, rot(trans[0])];
   }
   
   rmatrix = getRotation(angle);
@@ -156,7 +157,7 @@ function redraw() {
     canvas.font = FONT;
     canvas.globalAlpha = 0.6;
     
-    for (var i=0; i < families.length; i++) {
+    for (i=0; i < families.length; i++) {
       var t = families[i];
       canvas.fillStyle = t.col;
       text3d(t.n, t.pos);
@@ -184,7 +185,7 @@ function path3d(d) {
       canvas.moveTo(pt[0], pt[1]);
     else
       canvas.lineTo(pt[0], pt[1]);
-  };
+  }
   canvas.stroke();
 }
 
