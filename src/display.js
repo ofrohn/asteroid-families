@@ -19,8 +19,8 @@ var Asteroids = {
       FONT = "12px sans-serif",
       showNames = true;
   
-  var margin = 25,
-      width = 600 - margin * 2,
+  var margin = 40,
+      width = 640 - margin * 2,
       height = width,
       halfwidth = width / 2,
       offset = halfwidth + margin,
@@ -39,20 +39,12 @@ var Asteroids = {
     ip: d3.scale.linear().domain([0.0, 0.3]).range([-halfwidth, halfwidth])
   };
   
-  //Scales for rotation with dragging
-  //x = d3.scale.linear().domain([-width/2, width/2]).range([-180+angle[0], 180+angle[0]]);
-  //z = d3.scale.linear().domain([-height/2, height/2]).range([90-angle[2], -90-angle[2]]);
+  //Scale for rotation with dragging
   rot = d3.scale.linear().domain([-width/2, width/2]).range([-90, 90]);
-  //z = d3.scale.linear().domain([-height/2, height/2]).range([-90, 90]);
 
   var zoom = d3.behavior.zoom().center([0, 0]).scaleExtent([0.7, 3]).translate([rot.invert(angle[0]), rot.invert(angle[2])]).scale(zoomlvl).on("zoom", redraw);
-  //
-  //var line = d3.svg.line().x( function(d) { return d[0]; } ).y( function(d) { return d[1]; } );
-
+  //rotationmatrix for angle [x,y,z]  
   rmatrix = getRotation(angle);
-  
-    //angle = [x(trans[1]), 0, z(trans[0])];
-    //trans = ([x.invert(angle[2]), z.invert(angle[1])])
   
 Asteroids.display = function(config) {
   
