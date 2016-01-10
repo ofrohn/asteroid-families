@@ -413,36 +413,35 @@ var Asteroids = {
   };
   
   //Scale for rotation with dragging
-  rot = d3.scale.linear().domain([-width/2, width/2]).range([-90, 90]);
+  var rot = d3.scale.linear().domain([-halfwidth, halfwidth]).range([-90, 90]);
 
-  var zoom = d3.behavior.zoom().center([0, 0]).scaleExtent([0.7, 3]).translate([rot.invert(angle[0]), rot.invert(angle[2])]).scale(zoomlvl).on("zoom", redraw);
+  var zoom = d3.behavior.zoom().center([0, 0]).scaleExtent([0.7, 3]).scale(zoomlvl).on("zoom", redraw);
   //rotationmatrix for angle [x,y,z]  
   rmatrix = getRotation(angle);
-  
+
+
 Asteroids.display = function(config) {
   
-  d3.select("#names").on("click", function() {
-    showNames = !showNames;
-    redraw();
-  });
+  if (config) {
+    if (has(config, "width")) setScale(config.width);
+  }  
 
-  d3.select("#ae").on("click", function() {
-    angle = angles.ae;
-    turn();
-  });
-  d3.select("#ai").on("click", function() {
-    angle = angles.ai;
-    turn();
-  });
-  d3.select("#ei").on("click", function() {
-    angle = angles.ei;
-    turn();
-  });
+  //Buttons
+  //d3.select("#names").on("click", function() { showNames = !showNames; redraw(); });
+  //d3.select("#ae").on("click", function() { angle = angles.ae; turn(); });
+  //d3.select("#ai").on("click", function() { angle = angles.ai; turn(); });
+  //d3.select("#ei").on("click", function() { angle = angles.ei; turn(); });
 
   canvas = d3.select("#map").append("canvas")
       .attr("width", width + margin * 2)
       .attr("height", height + margin * 2)
       .call(zoom).node().getContext("2d");
+  
+  var nav = d3.select("#map").append("div").attr("class", "ctrl").html("Show ");
+  nav.append("button").attr("class", "button").attr("id", "names").html("Names").on("click", function() { showNames = !showNames; redraw(); });
+  nav.append("button").attr("class", "button").attr("id", "ae").html("a vs. e").on("click", function() { angle = angles.ae; turn(); });
+  nav.append("button").attr("class", "button").attr("id", "ai").html("a vs. sin i").on("click", function() { angle = angles.ai; turn(); });
+  nav.append("button").attr("class", "button").attr("id", "ae").html("e vs. sin i").on("click", function() { angle = angles.ei; turn(); });
   
   axes = {
     x: axis3d().scale(scale.ap).ticks(17).tickPadding(6).title("a\u209a / AU"),
@@ -458,6 +457,8 @@ Asteroids.display = function(config) {
     z2: axis3d().scale(scale.ip).orient(["bottom", "right"]).ticks(0).dash([2,4]),
     z3: axis3d().scale(scale.ip).orient(["top", "right"]).ticks(0).dash([2,4])
   };
+  
+  zoom.translate([rot.invert(angle[0]), rot.invert(angle[2])]);
   
   d3.csv('data/ast-proper14.csv', function(error, csv) {
     if (error) return console.log(error);
@@ -530,6 +531,18 @@ function redraw() {
     canvas.globalAlpha = 1.0;
   }
 }
+
+function setScale(w) {
+  width = w - margin * 2;
+  height = width;
+  halfwidth = width / 2;
+  offset = halfwidth + margin;
+  scale.ap.range([-halfwidth, halfwidth]);
+  scale.ep.range([-halfwidth, halfwidth]);
+  scale.ip.range([-halfwidth, halfwidth]);
+  rot.domain([-halfwidth, halfwidth]);
+}
+
 
 function circle3d(d) {
   canvas.fillStyle = d.col;
