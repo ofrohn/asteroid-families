@@ -2,49 +2,43 @@ var Asteroids = {
   version: '0.1',
   svg: null
 };
-  /* x Axis Object
-     x  Line, Position, Values l h, Title, Visibility
-       Ticks major minor
-       No Axis when foreshortened
-         a vs. e  if (abs angle[0] < 10 && abs angle[2] < 10)
-         a vs. i  if (abs angle[0] > 80 && abs angle[2] < 10)
-         e vs. i  if (abs angle[0] < 10 && abs angle[2] > 80)
-     x Families
-     x Vesta,Flora,Baptistina,Nyssa-Polana,Agnia,Eunomia,Mitidika,Teutonia,Ursula,Koronis,Eos,Hygiea,Themis
-     Gaps?  2.5,2.82
-   */
-  var rmatrix, canvas, sbos = [], families = [], axes, 
-      LINECOL = "#fff",
-      LINEWIDTH = 1.2,
-      FONT = "12px sans-serif",
-      showNames = true;
-  
-  var margin = 40,
-      width = 640 - margin * 2,
-      height = width,
-      halfwidth = width / 2,
-      offset = halfwidth + margin,
-      zoomlvl = 0.9, 
-      angles = {
-        ae: [0, 0, 0],   //a vs. e  
-        ai: [90, 0, 0],  //a vs. i  
-        ei: [0, 0, -90]  //e vs. i 
-      },
-      angle = angles.ae;
-      
-  //d3.scale.linear()
-  var scale = { 
-    ap: d3.scale.linear().domain([2.0, 3.7]).range([-halfwidth, halfwidth]),
-    ep: d3.scale.linear().domain([0.0, 0.3]).range([-halfwidth, halfwidth]),
-    ip: d3.scale.linear().domain([0.0, 0.3]).range([-halfwidth, halfwidth])
-  };
-  
-  //Scale for rotation with dragging
-  var rot = d3.scale.linear().domain([-halfwidth, halfwidth]).range([-90, 90]);
 
-  var zoom = d3.behavior.zoom().center([0, 0]).scaleExtent([0.7, 3]).scale(zoomlvl).on("zoom", redraw);
-  //rotationmatrix for angle [x,y,z]  
-  rmatrix = getRotation(angle);
+var ASTDATA = 'data/ast-proper14.csv',
+    LINECOL = "#fff",
+    LINEWIDTH = 1.2,
+    FONT = "12px sans-serif",
+    margin = {h:40, v:20},
+    width = 640 - margin.h * 2,
+    height = 640 - margin.v * 2,
+    halfwidth = width / 2,
+    offset = {h: halfwidth + margin.h, v:halfwidth + margin.h},
+    zoomlvl = 0.9, 
+    showNames = true,
+    angles = {
+      ae: [0, 0, 0],   //a vs. e  
+      ai: [90, 0, 0],  //a vs. i  
+      ei: [0, 0, -90]  //e vs. i 
+    },
+    angle = angles.ae;
+
+var color_btn = "rgba(255,255,255,0.1)",
+    color_sel = "rgba(255,255,255,0.3)";
+    
+var rmatrix, canvas, sbos = [], families = [], axes;
+
+// x,y,z scales
+var scale = { 
+  ap: d3.scale.linear().domain([2.0, 3.7]).range([-halfwidth, halfwidth]),
+  ep: d3.scale.linear().domain([0.0, 0.3]).range([-halfwidth, halfwidth]),
+  ip: d3.scale.linear().domain([0.0, 0.3]).range([-halfwidth, halfwidth])
+};
+
+//Scale for rotation with dragging
+var rot = d3.scale.linear().domain([-halfwidth, halfwidth]).range([-90, 90]);
+
+var zoom = d3.behavior.zoom().center([0, 0]).scaleExtent([0.7, 3]).scale(zoomlvl).on("zoom", redraw);
+//rotationmatrix for angle [x,y,z]  
+rmatrix = getRotation(angle);
 
 
 Asteroids.display = function(config) {
@@ -53,22 +47,21 @@ Asteroids.display = function(config) {
     if (has(config, "width")) setScale(config.width);
   }  
 
-  //Buttons
-  //d3.select("#names").on("click", function() { showNames = !showNames; redraw(); });
-  //d3.select("#ae").on("click", function() { angle = angles.ae; turn(); });
-  //d3.select("#ai").on("click", function() { angle = angles.ai; turn(); });
-  //d3.select("#ei").on("click", function() { angle = angles.ei; turn(); });
-
   canvas = d3.select("#map").append("canvas")
-      .attr("width", width + margin * 2)
-      .attr("height", height + margin * 2)
+      .attr("width", width + margin.h * 2)
+      .attr("height", height + margin.v * 2)
       .call(zoom).node().getContext("2d");
   
+  //Buttons
   var nav = d3.select("#map").append("div").attr("class", "ctrl").html("Show ");
-  nav.append("button").attr("class", "button").attr("id", "names").html("Names").on("click", function() { showNames = !showNames; redraw(); });
-  nav.append("button").attr("class", "button").attr("id", "ae").html("a vs. e").on("click", function() { angle = angles.ae; turn(); });
-  nav.append("button").attr("class", "button").attr("id", "ai").html("a vs. sin i").on("click", function() { angle = angles.ai; turn(); });
-  nav.append("button").attr("class", "button").attr("id", "ae").html("e vs. sin i").on("click", function() { angle = angles.ei; turn(); });
+  nav.append("button").attr("class", "button").attr("id", "names").html("No Names").on("click", function() { 
+    showNames = !showNames; 
+    d3.select("#names").html( function() { return showNames ? "No Names" : "Names"; } );
+    redraw(); 
+  });
+  nav.append("button").attr("class", "button").style("background", color_sel).attr("id", "ae").html("a vs. e").on("click", function() { angle = angles.ae; turn("ae"); });
+  nav.append("button").attr("class", "button").attr("id", "ai").html("a vs. sin i").on("click", function() { angle = angles.ai; turn("ai"); });
+  nav.append("button").attr("class", "button").attr("id", "ae").html("e vs. sin i").on("click", function() { angle = angles.ei; turn("ei"); });
   
   axes = {
     x: axis3d().scale(scale.ap).ticks(17).tickPadding(6).title("a\u209a / AU"),
@@ -87,7 +80,7 @@ Asteroids.display = function(config) {
   
   zoom.translate([rot.invert(angle[0]), rot.invert(angle[2])]);
   
-  d3.csv('data/ast-proper14.csv', function(error, csv) {
+  d3.csv(ASTDATA, function(error, csv) {
     if (error) return console.log(error);
           
     for (var key in csv) {
@@ -116,12 +109,18 @@ function translate(d) {
   var p = vMultiply(rmatrix, d);
   
   p[0] *= zoomlvl; p[2] *= zoomlvl;  
-  return [ p[0] + offset, -p[2] + offset ];
+  return [ p[0] + offset.h, -p[2] + offset.v ];
   //return "translate(" + p[0] + "," + -p[2] + ")";
 }
 
-function turn() {
+    
+function turn(sel) {
+  d3.select("#ae").style("background", function() { return sel === "ae" ? color_sel : color_btn; });
+  d3.select("#ai").style("background", function() { return sel === "ai" ? color_sel : color_btn; });
+  d3.select("#ei").style("background", function() { return sel === "ei" ? color_sel : color_btn; });
   zoom.translate([rot.invert(angle[2]), rot.invert(angle[0])]);
+  //doesn't work that way
+  //zoom.event(canvas.transition().duration(1000));
   redraw();
 }
 
@@ -135,7 +134,7 @@ function redraw() {
   
   rmatrix = getRotation(angle);
 
-  canvas.clearRect(0, 0, width + margin * 2, height + margin * 2);
+  canvas.clearRect(0, 0, width + margin.h * 2, height + margin.v * 2);
   for (var key in axes) axes[key](canvas);
 
   //draw objects
@@ -160,10 +159,12 @@ function redraw() {
 }
 
 function setScale(w) {
-  width = w - margin * 2;
-  height = width;
+  //var par = $("map").parentNode;
+  //if (par.offsetWidth > w) margin.h += (par.offsetWidth - w) / 2;
+  width = w - margin.h * 2;
+  height = w - margin.v * 2;
   halfwidth = width / 2;
-  offset = halfwidth + margin;
+  offset = {h: halfwidth + margin.h, v:halfwidth + margin.h};
   scale.ap.range([-halfwidth, halfwidth]);
   scale.ep.range([-halfwidth, halfwidth]);
   scale.ip.range([-halfwidth, halfwidth]);
