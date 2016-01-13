@@ -1,6 +1,6 @@
 # Asteroid Families
 
- A 3D plot of asteroid families by proper elements and colors implemented with D3.js. Shows main belt asteroids grouped naturally by their proper orbital elements semi major axis (a<sub>p</sub>), inclnation (sin i<sub>p</sub>) and eccentricity (e<sub>p</sub>). The color coding is from diagnostic colors indicative of composition `astar = 0.89 * (g - r) + 0.45 * (r - i) - 0.57` and `i - z`, calculated from SDSS filter bands u, g, r, i, z (See paper linked below for details).
+ A 3D plot of asteroid families by proper elements and colors implemented with d3.js. Shows main belt asteroids grouped naturally by their proper orbital elements semi major axis (a<sub>p</sub>), inclination (sin i<sub>p</sub>) and eccentricity (e<sub>p</sub>). The color coding is from diagnostic colors indicative of composition `astar = 0.89 * (g - r) + 0.45 * (r - i) - 0.57` and `i - z`, calculated from SDSS filter bands u, g, r, i, z (See paper linked below for details).
 
 ### Files
 
