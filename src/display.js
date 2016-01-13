@@ -3,7 +3,7 @@ var Asteroids = {
   svg: null
 };
 
-var ASTDATA = 'ast-proper14.csv',
+var ASTDATA = "ast-proper14.csv",
     DATAPATH = "./data/",
     LIMIT = 14,
     LINECOL = "#fff",
