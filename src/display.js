@@ -94,7 +94,7 @@ Asteroids.display = function(config) {
     redraw();
   });
 
-  d3.csv('data/families.csv', function(error, csv) {
+  d3.csv(DATAPATH + 'families.csv', function(error, csv) {
     if (error) return console.log(error);
           
     for (var key in csv) {
