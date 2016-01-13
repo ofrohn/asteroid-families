@@ -46,6 +46,7 @@ Asteroids.display = function(config) {
   
   if (config) {
     if (has(config, "width")) setScale(config.width);
+    if (has(config, "datapath") && config.datapath.search(/\.csv$/) !== -1) ASTDATA = config.datapath;
   }  
 
   canvas = d3.select("#map").append("canvas")
