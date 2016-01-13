@@ -1,5 +1,7 @@
 body { margin:0; padding:0; _overflow: hidden;  }
-canvas { z-index: 100;}
+canvas { z-index: 100; cursor:hand; cursor:grab; cursor:-moz-grab; cursor:-webkit-grab; /*cursor: crosshair!important;*/ }
+canvas:active { cursor: grabbing; cursor: -moz-grabbing; cursor: -webkit-grabbing; }
+
 #map { display: inline-block; width:720; height:720; background: #000; background-color:#000;  }
 
 .dot { fill: #fff; }

@@ -3,7 +3,8 @@ var Asteroids = {
   svg: null
 };
 
-var ASTDATA = 'data/ast-proper14.csv',
+var ASTDATA = 'ast-proper14.csv',
+    DATAPATH = "./data/",
     LIMIT = 14,
     LINECOL = "#fff",
     LINEWIDTH = 1.2,
@@ -46,7 +47,7 @@ Asteroids.display = function(config) {
   
   if (config) {
     if (has(config, "width")) setScale(config.width);
-    if (has(config, "datapath") && config.datapath.search(/\.csv$/) !== -1) ASTDATA = config.datapath;
+    if (has(config, "datapath")) DATAPATH = config.datapath;
   }  
 
   canvas = d3.select("#map").append("canvas")
@@ -82,7 +83,7 @@ Asteroids.display = function(config) {
   
   zoom.translate([rot.invert(angle[0]), rot.invert(angle[2])]);
   
-  d3.csv(ASTDATA, function(error, csv) {
+  d3.csv(DATAPATH + ASTDATA, function(error, csv) {
     if (error) return console.log(error);
           
     for (var key in csv) {
