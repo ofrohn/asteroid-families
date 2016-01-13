@@ -5,7 +5,7 @@ var shell = require('shelljs/make'),
     tar = require('tar-fs'),
     zlib = require('zlib'),
     copy = "// Copyright 2015 Olaf Frohn https://github.com/ofrohn, see LICENSE\n",
-    begin = "!(function() {",
+    begin = "!(function() {\n",
     end = "this.Asteroids = Asteroids;\n})();",
     filename = './asteroids';
 

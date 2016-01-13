@@ -1,5 +1,6 @@
 // Copyright 2015 Olaf Frohn https://github.com/ofrohn, see LICENSE
-!(function() {var Asteroids = {
+!(function() {
+var Asteroids = {
   version: '0.1',
   svg: null
 };
