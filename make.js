@@ -48,11 +48,11 @@ target.build = function() {
   echo('Copying files');
 
   var file = cat([
+    './src/display.js',
     './src/util.js',
     './src/matrix.js', 
     './src/get.js',
-    './src/axis.js', 
-    './src/display.js'
+    './src/axis.js'
   ]);
   file = copy + begin + file.replace(/\/\* global.*/g, '') + end;
   file.to(filename + '.js');
@@ -77,7 +77,7 @@ target.build = function() {
 
   // zip data + prod. code + css
   tar.pack('./', {
-       entries: ['viewer.html', 'style.css', 'readme.md', 'LICENSE', 'asteroids.min.js', 'data', 'lib/d3.min.js'] 
+       entries: ['viewer.html', 'style.css', 'readme.md', 'LICENSE', 'asteroids.min.js', 'asteroids.js', 'data', 'lib/d3.min.js', 'lib/d3.js'] 
      })
      .pipe(zlib.createGzip())
      .pipe(fs.createWriteStream(filename + '.tar.gz'))

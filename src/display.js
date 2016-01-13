@@ -40,7 +40,6 @@ var rot = d3.scale.linear().domain([-halfwidth, halfwidth]).range([-90, 90]);
 
 var zoom = d3.behavior.zoom().center([0, 0]).scaleExtent([0.7, 3]).scale(zoomlvl).on("zoom", redraw);
 //rotationmatrix for angle [x,y,z]  
-rmatrix = getRotation(angle);
 
 
 Asteroids.display = function(config) {
@@ -59,7 +58,7 @@ Asteroids.display = function(config) {
   var nav = d3.select("#map").append("div").attr("class", "ctrl").html("Show ");
   nav.append("button").attr("class", "button").style("background", color_sel).attr("id", "ae").html("a vs. e").on("click", function() { angle = angles.ae; turn("ae"); });
   nav.append("button").attr("class", "button").attr("id", "ai").html("a vs. sin i").on("click", function() { angle = angles.ai; turn("ai"); });
-  nav.append("button").attr("class", "button").attr("id", "ae").html("e vs. sin i").on("click", function() { angle = angles.ei; turn("ei"); });
+  nav.append("button").attr("class", "button").attr("id", "ei").html("e vs. sin i").on("click", function() { angle = angles.ei; turn("ei"); });
   nav.append("button").attr("class", "button").attr("id", "names").html("No Names").on("click", function() { 
     showNames = !showNames; 
     d3.select("#names").html( function() { return showNames ? "No Names" : "Names"; } );
@@ -81,6 +80,7 @@ Asteroids.display = function(config) {
     z3: axis3d().scale(scale.ip).orient(["top", "right"]).ticks(0).dash([2,4])
   };
   
+  //rmatrix = getRotation(angle);
   zoom.translate([rot.invert(angle[0]), rot.invert(angle[2])]);
   
   d3.csv(DATAPATH + ASTDATA, function(error, csv) {
@@ -150,7 +150,7 @@ function redraw() {
     canvas.textAlign = "center";
     canvas.textBaseline = "middle";
     canvas.font = FONT;
-    canvas.globalAlpha = 0.6;
+    canvas.globalAlpha = 0.7;
     
     for (i=0; i < families.length; i++) {
       var t = families[i];
