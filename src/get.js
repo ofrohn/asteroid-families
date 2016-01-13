@@ -7,8 +7,8 @@ var getObject = function(d) {
       z = scale.ip(d.sinip),
       col = astColor(d), r;
 
-  if (d.H && d.H !== "") r = 12 - d.H;
-  else r = 0.8;
+  if (d.H && d.H !== "") r = Math.sqrt(LIMIT + 1 - d.H);
+  else r = 0.9;
       
   return {pos:[x, y, z], col:col, r:r};
 };

@@ -4,6 +4,7 @@ var Asteroids = {
 };
 
 var ASTDATA = 'data/ast-proper14.csv',
+    LIMIT = 14,
     LINECOL = "#fff",
     LINEWIDTH = 1.2,
     FONT = "12px sans-serif",
@@ -54,14 +55,14 @@ Asteroids.display = function(config) {
   
   //Buttons
   var nav = d3.select("#map").append("div").attr("class", "ctrl").html("Show ");
+  nav.append("button").attr("class", "button").style("background", color_sel).attr("id", "ae").html("a vs. e").on("click", function() { angle = angles.ae; turn("ae"); });
+  nav.append("button").attr("class", "button").attr("id", "ai").html("a vs. sin i").on("click", function() { angle = angles.ai; turn("ai"); });
+  nav.append("button").attr("class", "button").attr("id", "ae").html("e vs. sin i").on("click", function() { angle = angles.ei; turn("ei"); });
   nav.append("button").attr("class", "button").attr("id", "names").html("No Names").on("click", function() { 
     showNames = !showNames; 
     d3.select("#names").html( function() { return showNames ? "No Names" : "Names"; } );
     redraw(); 
   });
-  nav.append("button").attr("class", "button").style("background", color_sel).attr("id", "ae").html("a vs. e").on("click", function() { angle = angles.ae; turn("ae"); });
-  nav.append("button").attr("class", "button").attr("id", "ai").html("a vs. sin i").on("click", function() { angle = angles.ai; turn("ai"); });
-  nav.append("button").attr("class", "button").attr("id", "ae").html("e vs. sin i").on("click", function() { angle = angles.ei; turn("ei"); });
   
   axes = {
     x: axis3d().scale(scale.ap).ticks(17).tickPadding(6).title("a\u209a / AU"),
