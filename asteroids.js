@@ -147,8 +147,8 @@ var getObject = function(d) {
       z = scale.ip(d.sinip),
       col = astColor(d), r;
 
-  if (d.H && d.H !== "") r = 12 - d.H;
-  else r = 0.8;
+  if (d.H && d.H !== "") r = Math.sqrt(LIMIT + 1 - d.H);
+  else r = 0.9;
       
   return {pos:[x, y, z], col:col, r:r};
 };
@@ -376,7 +376,9 @@ var Asteroids = {
   svg: null
 };
 
-var ASTDATA = 'data/ast-proper14.csv',
+var ASTDATA = 'ast-proper14.csv',
+    DATAPATH = "./data/",
+    LIMIT = 14,
     LINECOL = "#fff",
     LINEWIDTH = 1.2,
     FONT = "12px sans-serif",
@@ -418,6 +420,7 @@ Asteroids.display = function(config) {
   
   if (config) {
     if (has(config, "width")) setScale(config.width);
+    if (has(config, "datapath")) DATAPATH = config.datapath;
   }  
 
   canvas = d3.select("#map").append("canvas")
@@ -427,14 +430,14 @@ Asteroids.display = function(config) {
   
   //Buttons
   var nav = d3.select("#map").append("div").attr("class", "ctrl").html("Show ");
+  nav.append("button").attr("class", "button").style("background", color_sel).attr("id", "ae").html("a vs. e").on("click", function() { angle = angles.ae; turn("ae"); });
+  nav.append("button").attr("class", "button").attr("id", "ai").html("a vs. sin i").on("click", function() { angle = angles.ai; turn("ai"); });
+  nav.append("button").attr("class", "button").attr("id", "ae").html("e vs. sin i").on("click", function() { angle = angles.ei; turn("ei"); });
   nav.append("button").attr("class", "button").attr("id", "names").html("No Names").on("click", function() { 
     showNames = !showNames; 
     d3.select("#names").html( function() { return showNames ? "No Names" : "Names"; } );
     redraw(); 
   });
-  nav.append("button").attr("class", "button").style("background", color_sel).attr("id", "ae").html("a vs. e").on("click", function() { angle = angles.ae; turn("ae"); });
-  nav.append("button").attr("class", "button").attr("id", "ai").html("a vs. sin i").on("click", function() { angle = angles.ai; turn("ai"); });
-  nav.append("button").attr("class", "button").attr("id", "ae").html("e vs. sin i").on("click", function() { angle = angles.ei; turn("ei"); });
   
   axes = {
     x: axis3d().scale(scale.ap).ticks(17).tickPadding(6).title("a\u209a / AU"),
@@ -453,7 +456,7 @@ Asteroids.display = function(config) {
   
   zoom.translate([rot.invert(angle[0]), rot.invert(angle[2])]);
   
-  d3.csv(ASTDATA, function(error, csv) {
+  d3.csv(DATAPATH + ASTDATA, function(error, csv) {
     if (error) return console.log(error);
           
     for (var key in csv) {
@@ -464,7 +467,7 @@ Asteroids.display = function(config) {
     redraw();
   });
 
-  d3.csv('data/families.csv', function(error, csv) {
+  d3.csv(DATAPATH + 'families.csv', function(error, csv) {
     if (error) return console.log(error);
           
     for (var key in csv) {
